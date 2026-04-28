@@ -12,7 +12,7 @@ pipeline {
         SCANNER_HOME = tool 'sonar-scanner'
         
         // --- AWS/EKS Config ---
-        CLUSTER_NAME = 'devops-eks'
+        CLUSTER_NAME = 'Accounts-recievable'
         REGION = 'us-east-1'
     }
 
@@ -38,8 +38,10 @@ pipeline {
         stage('Install Backend Deps') {
             steps {
                 dir('flask-integration') {
-                    // Using --break-system-packages because python3-venv is missing on the agent
-                    sh 'python3 -m pip install --break-system-packages flask flask-cors pandas scikit-learn numpy pylint pytest safety'
+                    sh """
+                    python3 -m venv venv
+                    ./venv/bin/pip install flask flask-cors pandas scikit-learn numpy pylint pytest safety
+                    """
                 }
             }
         }
@@ -63,7 +65,7 @@ pipeline {
         stage('Backend Tests') {
             steps {
                 dir('flask-integration') {
-                    sh 'python3 -m pytest || echo "No tests found yet."'
+                    sh './venv/bin/pytest || echo "No tests found yet."'
                 }
             }
         }
